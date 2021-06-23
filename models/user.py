@@ -1,6 +1,10 @@
 from models.shared import db
 
 
+def get_by_jwt_identifier(identifier):
+    return db.session.query(User).filter_by(id=identifier).first()
+
+
 class User(db.Model):
     id = db.Column(db.INT, primary_key=True)
     username = db.Column(db.String(100), unique=True)

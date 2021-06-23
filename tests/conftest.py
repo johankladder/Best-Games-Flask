@@ -1,4 +1,6 @@
 import pytest
+from flask_jwt_extended import create_access_token
+
 from app import create_app, db
 from models.user import User
 from models.game import Game
@@ -44,3 +46,13 @@ def create_score(score, uid, gid, database):
     database.session.add(score)
     database.session.commit()
     return score
+
+
+def get_authorised_headers(user: User = None):
+    if user is None:
+        user = create_user('johankladder', 'password', db)
+    access_token = create_access_token(identity=user.id)
+    authorization = 'Bearer ' + access_token
+    return {
+        'Authorization': authorization
+    }

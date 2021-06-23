@@ -1,9 +1,16 @@
 from http.client import NOT_FOUND
 from flask import Blueprint, abort
+from flask_jwt_extended import jwt_required
 from models.game import Game, db
 import json
 
 games = Blueprint('games', __name__)
+
+
+@games.before_request
+@jwt_required()
+def before():
+    return
 
 
 @games.route('/games', methods=["get"])

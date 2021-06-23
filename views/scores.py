@@ -1,7 +1,9 @@
 from http.client import NOT_FOUND
 from flask import Blueprint, abort
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from models.shared import db
-from models.user import User
+from models.user import User, get_by_jwt_identifier
 from models.score import Score
 from models.game import Game
 import json
@@ -10,9 +12,15 @@ import json
 scores = Blueprint('my_scores', __name__)
 
 
-@scores.route('/myscores/<uid>', methods=["get"])
-def get_scores(uid):
-    found_user = __get_user(uid)
+@scores.before_request
+@jwt_required()
+def before():
+    return
+
+
+@scores.route('/myscores', methods=["get"])
+def get_scores():
+    found_user = get_by_jwt_identifier(get_jwt_identity())
     if found_user is not None:
         found_scores = []
 
@@ -34,10 +42,6 @@ def get_top_scores(gid):
         return json.dumps(found_scores)
     else:
         abort(NOT_FOUND, 'Game was not found!')
-
-
-def __get_user(uid):
-    return db.session.query(User).filter_by(id=uid).first()
 
 
 def __get_game(gid):

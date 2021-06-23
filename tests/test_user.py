@@ -1,6 +1,6 @@
 from flask import json
 
-from conftest import create_user
+from conftest import create_user, get_authorised_headers
 from models.user import User
 
 
@@ -55,28 +55,26 @@ class TestUser:
 
         assert rv.status_code == 400
 
-    def test_update_not_existing_user(self, client, database):
-        rv = client.put("/user/1", data=dict(
+    def test_update_not_authorized(self, client, database):
+        rv = client.put("/user", data=dict(
             username='johankladder',
             password='updated-password'
         ))
-
-        assert rv.status_code == 404
+        assert rv.status_code == 401
 
     def test_update_existing_user_missing_fields(self, client, database):
         user = create_user(username='johankladder', password='password', database=database)
-        rv = client.put("/user/" + str(user.id), data=dict(
+        rv = client.put("/user", data=dict(
             username='johankladder',
-        ))
-
+        ), headers=get_authorised_headers(user))
         assert rv.status_code == 400
 
     def test_update_existing_user(self, client, database):
         user = create_user(username='johankladder', password='password', database=database)
-        rv = client.put("/user/" + str(user.id), data=dict(
+        rv = client.put("/user", data=dict(
             username='updated-johankladder',
             password='updated-password'
-        ))
+        ), headers=get_authorised_headers(user))
 
         assert rv.status_code == 200
 

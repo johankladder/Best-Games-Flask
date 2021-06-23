@@ -1,6 +1,6 @@
 from flask import json
 
-from conftest import create_user, create_game, create_score
+from conftest import create_user, create_game, create_score, get_authorised_headers
 
 
 def __create_score_with_game(gid, uid, score, database):
@@ -15,12 +15,11 @@ def __create_score_with_game(gid, uid, score, database):
 class TestMyScores:
 
     def test_get_scores_invalid_user_id(self, client, database):
-        rv = client.get('/myscores/1')
-        assert rv.status_code == 404
+        rv = client.get('/myscores')
+        assert rv.status_code == 401
 
     def test_get_scores_empty(self, client, database):
-        user = create_user('johankladder', 'password', database)
-        rv = client.get('/myscores/' + str(user.id))
+        rv = client.get('/myscores', headers=get_authorised_headers())
         assert rv.status_code == 200
 
         data = json.loads(rv.data)
@@ -31,7 +30,7 @@ class TestMyScores:
         game = create_game('memory', 'www.memory.nl', database)
         score = create_score(1, user.id, game.id, database)
 
-        rv = client.get('/myscores/' + str(user.id))
+        rv = client.get('/myscores', headers=get_authorised_headers(user))
         assert rv.status_code == 200
 
         data = json.loads(rv.data)
@@ -46,7 +45,7 @@ class TestMyScores:
         score_1 = create_score(1, user_1.id, game.id, database)
         create_score(1, user_2.id, game.id, database)
 
-        rv = client.get('/myscores/' + str(user_1.id))
+        rv = client.get('/myscores', headers=get_authorised_headers(user_1))
         assert rv.status_code == 200
 
         data = json.loads(rv.data)
@@ -55,12 +54,12 @@ class TestMyScores:
         assert data[0]['score'] == score_1.score
 
     def test_get_top_scores_invalid_game(self, client, database):
-        rv = client.get('/topscores/1')
+        rv = client.get('/topscores/1', headers=get_authorised_headers())
         assert rv.status_code == 404
 
     def test_get_top_scores_empty_scores(self, client, database):
         game = create_game('memory', 'www.memory.nl', database)
-        rv = client.get('/topscores/' + str(game.id))
+        rv = client.get('/topscores/' + str(game.id), headers=get_authorised_headers())
         assert rv.status_code == 200
 
         data = json.loads(rv.data)
@@ -73,7 +72,7 @@ class TestMyScores:
         create_score(9, game.id, user.id, database)
         create_score(8, game.id, user.id, database)
 
-        rv = client.get('/topscores/' + str(game.id))
+        rv = client.get('/topscores/' + str(game.id), headers=get_authorised_headers(user))
         assert rv.status_code == 200
 
         data = json.loads(rv.data)
@@ -96,7 +95,7 @@ class TestMyScores:
         create_score(2, game.id, user.id, database)
         create_score(1, game.id, user.id, database)
 
-        rv = client.get('/topscores/' + str(game.id))
+        rv = client.get('/topscores/' + str(game.id), headers=get_authorised_headers(user))
         assert rv.status_code == 200
 
         data = json.loads(rv.data)

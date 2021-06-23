@@ -1,6 +1,7 @@
 from http.client import BAD_REQUEST
 from flask import Blueprint, request, abort
 from models.user import User, db
+from flask_jwt_extended import create_access_token
 
 from views.schemas.login_schema import LoginSchema
 
@@ -20,8 +21,10 @@ def login():
 
     user = __get_authenticated_user(username, password)
     if user is not None:
-        return dict(token="jwt-token", id=user.id)
-
+        return dict(
+            id=user.id,
+            token=create_access_token(identity=user.id)
+        )
     abort(BAD_REQUEST, "Given credentials are not correct")
 
 
