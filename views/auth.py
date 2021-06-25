@@ -12,12 +12,14 @@ login_schema = LoginSchema()
 
 @auth.route('/login', methods=["POST"])
 def login():
-    errors = login_schema.validate(request.form)
+    data = request.get_json(silent=True)
+    print(data)
+    errors = login_schema.validate(data)
     if errors:
         abort(BAD_REQUEST, str(errors))
 
-    username = request.form['username']
-    password = request.form['password']
+    username = data['username']
+    password = data['password']
 
     user = __get_authenticated_user(username, password)
     if user is not None:
@@ -29,7 +31,7 @@ def login():
 
 
 def __get_authenticated_user(username, password):
-    user = db.session.query(User).filter_by(username=username).one()
+    user = db.session.query(User).filter_by(username=username).first()
     if user is not None:
         if user.password == password:
             return user

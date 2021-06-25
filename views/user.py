@@ -28,14 +28,15 @@ def get_user(uid):
         )
 
 
-@user.route('/user/', methods=["post"])
+@user.route('/user', methods=["POST"])
 def create_user():
-    errors = register_schema.validate(request.form)
+    data = request.get_json(silent=True)
+    errors = register_schema.validate(data)
     if errors:
         abort(BAD_REQUEST, str(errors))
 
-    username = request.form['username']
-    password = request.form['password']
+    username = data['username']
+    password = data['password']
 
     created_user = User(username, password)
     try:
@@ -51,12 +52,13 @@ def create_user():
 @jwt_required()
 def update_user():
     found_user = get_by_jwt_identifier(get_jwt_identity())
-    errors = update_schema.validate(request.form)
+    data = request.get_json(silent=True)
+    errors = update_schema.validate(data)
     if errors or found_user is None:
         abort(BAD_REQUEST, str(errors))
     else:
-        found_user.username = request.form['username']
-        found_user.password = request.form['password']
+        found_user.username = data['username']
+        found_user.password = data['password']
         db.session.commit()
         return 'User updated successfully!'
 

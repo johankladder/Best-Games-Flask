@@ -20,21 +20,21 @@ class TestUser:
         assert data['username'] == user.username
 
     def test_create_user_with_missing_values(self, client, database):
-        rv = client.post("/user/", data=dict())
+        rv = client.post("/user", json=dict())
         assert rv.status_code == 400
 
-        rv = client.post("/user/", data=dict(
+        rv = client.post("/user", json=dict(
             username='johankladder'
         ))
         assert rv.status_code == 400
 
-        rv = client.post("/user/", data=dict(
+        rv = client.post("/user", json=dict(
             password='johankladder'
         ))
         assert rv.status_code == 400
 
     def test_create_user(self, client, database):
-        rv = client.post("/user/", data=dict(
+        rv = client.post("/user", json=dict(
             username='johankladder',
             password='password'
         ))
@@ -48,7 +48,7 @@ class TestUser:
         database.session.add(user)
         database.session.commit()
 
-        rv = client.post("/user/", data=dict(
+        rv = client.post("/user", json=dict(
             username='johankladder',
             password='password'
         ))
@@ -56,7 +56,7 @@ class TestUser:
         assert rv.status_code == 400
 
     def test_update_not_authorized(self, client, database):
-        rv = client.put("/user", data=dict(
+        rv = client.put("/user", json=dict(
             username='johankladder',
             password='updated-password'
         ))
@@ -64,21 +64,25 @@ class TestUser:
 
     def test_update_existing_user_missing_fields(self, client, database):
         user = create_user(username='johankladder', password='password', database=database)
-        rv = client.put("/user", data=dict(
+        rv = client.put("/user", json=dict(
             username='johankladder',
         ), headers=get_authorised_headers(user))
         assert rv.status_code == 400
 
     def test_update_existing_user(self, client, database):
         user = create_user(username='johankladder', password='password', database=database)
-        rv = client.put("/user", data=dict(
+        rv = client.put("/user", json=dict(
             username='updated-johankladder',
             password='updated-password'
         ), headers=get_authorised_headers(user))
 
         assert rv.status_code == 200
 
-        user = database.session.query(User).filter_by(username='updated-johankladder', password='updated-password').first()
+        user = database.session.query(User).filter_by(
+            username='updated-johankladder',
+            password='updated-password'
+        ).first()
+
         assert user is not None
 
 

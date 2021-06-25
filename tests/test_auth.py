@@ -10,7 +10,7 @@ def test_login_missing_credentials(client):
 def test_login_wrong_credentials(client, database):
     __create_user(username='johankladder', password='password', database=database)
 
-    rv = client.post("/login", data=dict(
+    rv = client.post("/login", json=dict(
         username='johankladder',
         password='wrong-password'
     ))
@@ -20,7 +20,7 @@ def test_login_wrong_credentials(client, database):
 def test_login_correct_credentials(client, database):
     __create_user(username='johankladder', password='password', database=database)
 
-    rv = client.post("/login", data=dict(
+    rv = client.post("/login", json=dict(
         username='johankladder',
         password='password'
     ))
