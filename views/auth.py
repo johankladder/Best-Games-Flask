@@ -4,18 +4,15 @@ from services.database_service import db
 from models.user import User
 from models.block_list_token import BlockListToken
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
-
 from views.schemas.login_schema import LoginSchema
 
 auth = Blueprint('auth', __name__)
-
 login_schema = LoginSchema()
 
 
 @auth.route('/login', methods=["POST"])
 def login():
     data = request.get_json(silent=True)
-    print(data)
     errors = login_schema.validate(data)
     if errors:
         abort(BAD_REQUEST, str(errors))

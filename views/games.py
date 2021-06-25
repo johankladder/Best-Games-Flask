@@ -7,13 +7,8 @@ import json
 games = Blueprint('games', __name__)
 
 
-@games.before_request
-@jwt_required()
-def before():
-    return
-
-
 @games.route('/games', methods=["get"])
+@jwt_required()
 def get_games():
     found_games = []
     for found_game in db.session.query(Game).all():
@@ -23,6 +18,7 @@ def get_games():
 
 
 @games.route('/games/<gid>', methods=["get"])
+@jwt_required()
 def game(gid):
     found_game = __get_game(gid=gid)
     if found_game is not None:

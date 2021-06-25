@@ -12,13 +12,8 @@ import json
 scores = Blueprint('my_scores', __name__)
 
 
-@scores.before_request
-@jwt_required()
-def before():
-    return
-
-
 @scores.route('/myscores', methods=["get"])
+@jwt_required()
 def get_scores():
     found_user = get_by_jwt_identifier(get_jwt_identity())
     if found_user is not None:
@@ -33,6 +28,7 @@ def get_scores():
 
 
 @scores.route('/topscores/<gid>', methods=["get"])
+@jwt_required()
 def get_top_scores(gid):
     found_game = __get_game(gid)
     if found_game is not None:

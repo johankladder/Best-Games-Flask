@@ -17,6 +17,7 @@ update_schema = UpdateUserSchema()
 
 
 @user.route('/user/<uid>', methods=["get"])
+@jwt_required()
 def get_user(uid):
     found_user = db.session.query(User).filter_by(id=uid).first()
     if found_user is None:
