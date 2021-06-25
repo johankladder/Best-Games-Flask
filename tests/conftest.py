@@ -9,7 +9,7 @@ from models.score import Score
 
 @pytest.fixture
 def app():
-    app = create_app(isTest=True)
+    app = create_app(is_test=True)
     yield app
 
 

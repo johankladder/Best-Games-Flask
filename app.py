@@ -10,7 +10,8 @@ from models.block_list_token import BlockListToken
 
 import os
 
-def create_app(isTest = False):
+
+def create_app(is_test = False):
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": "*"}})
     jwt.init_app(app)
@@ -19,7 +20,7 @@ def create_app(isTest = False):
     app.register_blueprint(games)
     app.register_blueprint(scores)
     basedir = os.path.abspath(os.path.dirname(__file__))
-    database = 'db.sqlite' if isTest is not True else 'db-test.sqlite'
+    database = 'db.sqlite' if is_test is not True else 'db-test.sqlite'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, database)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['DEBUG'] = True
