@@ -3,3 +3,5 @@ static/
 venv/
 .idea/
 __pycache__/
+
+*.sqlite
