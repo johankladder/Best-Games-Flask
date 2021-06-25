@@ -4,17 +4,16 @@ from views.auth import auth
 from views.user import user
 from views.games import games
 from views.scores import scores
-from flask_jwt_extended import JWTManager
-from models.shared import db
+from services.database_service import db
+from services.jwt_service import jwt
+from models.block_list_token import BlockListToken
 
 import os
 
-
 def create_app(isTest = False):
-
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": "*"}})
-    jwt = JWTManager(app)
+    jwt.init_app(app)
     app.register_blueprint(auth)
     app.register_blueprint(user)
     app.register_blueprint(games)
@@ -34,3 +33,10 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run()
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+    blocked_token = db.session.query(BlockListToken).filter_by(token=jti).first()
+    return blocked_token is not None

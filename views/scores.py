@@ -2,7 +2,7 @@ from http.client import NOT_FOUND
 from flask import Blueprint, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models.shared import db
+from services.database_service import db
 from models.user import User, get_by_jwt_identifier
 from models.score import Score
 from models.game import Game

@@ -1,4 +1,4 @@
-from models.shared import db
+from services.database_service import db
 
 
 def get_by_jwt_identifier(identifier):

@@ -1,7 +1,9 @@
 from http.client import BAD_REQUEST
 from flask import Blueprint, request, abort
-from models.user import User, db
-from flask_jwt_extended import create_access_token
+from services.database_service import db
+from models.user import User
+from models.block_list_token import BlockListToken
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 
 from views.schemas.login_schema import LoginSchema
 
@@ -28,6 +30,21 @@ def login():
             token=create_access_token(identity=user.id)
         )
     abort(BAD_REQUEST, "Given credentials are not correct")
+
+
+@auth.route('/logout', methods=["POST"])
+@jwt_required()
+def logout():
+    block_token = BlockListToken(token=get_jwt()["jti"])
+    db.session.add(block_token)
+    db.session.commit()
+    return "OK"
+
+
+@auth.route('/authenticated', methods=["GET"])
+@jwt_required()
+def authenticated():
+    return "OK, you're still authenticated!'"
 
 
 def __get_authenticated_user(username, password):
