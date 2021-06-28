@@ -85,5 +85,7 @@ def __get_top_scores(game: Game):
 def __get_score_dict(score: Score):
     return dict(
         id=score.id,
-        score=score.score
+        user_id=score.user_id,
+        score=score.score,
+        username=score.user.username
     )

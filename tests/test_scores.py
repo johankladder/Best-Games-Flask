@@ -107,7 +107,7 @@ class TestMyScores:
 
     def test_add_score_invalid_game(self, client, database):
         rv = client.post('/myscores/12', headers=get_authorised_headers())
-        assert rv.status_code == 404
+        assert rv.status_code == 400
 
     def test_add_score_invalid_params(self, client, database):
         game = create_game('memory', 'www.memory.nl', database)

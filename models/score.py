@@ -1,3 +1,4 @@
+from sqlalchemy.orm import relationship
 from services.database_service import db
 
 
@@ -6,6 +7,8 @@ class Score(db.Model):
     score = db.Column(db.INT)
     user_id = db.Column(db.INT, db.ForeignKey('user.id'))
     game_id = db.Column(db.INT, db.ForeignKey('game.id'))
+
+    user = relationship("User", lazy='joined')
 
     def __init__(self, score, uid, gid):
         self.score = score
