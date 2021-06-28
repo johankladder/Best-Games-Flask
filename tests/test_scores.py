@@ -1,6 +1,7 @@
 from flask import json
 
 from conftest import create_user, create_game, create_score, get_authorised_headers
+from models.score import Score
 
 
 def __create_score_with_game(gid, uid, score, database):
@@ -104,3 +105,20 @@ class TestMyScores:
         assert data[1]['score'] == 2
         assert data[2]['score'] == 3
 
+    def test_add_score_invalid_game(self, client, database):
+        rv = client.post('/myscores/12', headers=get_authorised_headers())
+        assert rv.status_code == 404
+
+    def test_add_score_invalid_params(self, client, database):
+        game = create_game('memory', 'www.memory.nl', database)
+        rv = client.post('/myscores/' + str(game.id), headers=get_authorised_headers())
+        assert rv.status_code == 400
+
+    def test_add_score_happy_flow(self, client, database):
+        assert database.session.query(Score).count() == 0
+        game = create_game('memory', 'www.memory.nl', database)
+        rv = client.post('/myscores/' + str(game.id), json=dict(
+            score=1
+        ), headers=get_authorised_headers())
+        assert rv.status_code == 201
+        assert database.session.query(Score).count() == 1
